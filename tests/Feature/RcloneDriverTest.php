@@ -51,7 +51,7 @@ it('syncs each source with --backup-dir and excludes, then checks it and records
     fakeRclone(['sync' => Process::result(errorOutput: '{"level":"info","msg":"x"}'."\n".statsLine(2, 2048))]);
 
     $this->artisan('files:backup')
-        ->expectsOutputToContain('[media] ok: 2 files (8 B) → rclone filesbackup:myapp/media; uploaded 2 (2 KB), moved ? to versions')
+        ->expectsOutputToContain('[media] ok: 2 files (8 B) → rclone filesbackup:myapp/media; uploaded 2 (2 KB), pruned 0 old version folder(s)')
         ->assertSuccessful();
 
     [$sync] = rcloneCalls('sync');
