@@ -6,7 +6,8 @@ namespace Phattarachai\FilesBackupLaravel\Backup;
 
 /**
  * What one `files:backup` run did for one set. Counts a driver cannot tell
- * (rclone reports transfers, not which of them replaced a file) stay null.
+ * (rclone reports transfers, not which of them replaced a file) stay null and
+ * are left out of the summary.
  */
 final class SetReport
 {
@@ -42,17 +43,14 @@ final class SetReport
             return "[{$this->set}] FAILED: {$this->error}";
         }
 
-        return sprintf(
-            '[%s] ok: %d files (%s) → %s; uploaded %s, moved %s to versions, pruned %d old version folder(s), %.1fs.',
-            $this->set,
-            $this->files,
-            self::humanBytes($this->bytes),
-            $this->target,
-            $this->uploaded === null ? '?' : $this->uploaded.($this->uploadedBytes === null ? '' : ' ('.self::humanBytes($this->uploadedBytes).')'),
-            $this->versioned === null ? '?' : (string) $this->versioned,
-            count($this->prunedVersions),
-            $this->seconds,
-        );
+        $parts = array_filter([
+            $this->uploaded === null ? null : "uploaded {$this->uploaded}".($this->uploadedBytes === null ? '' : ' ('.self::humanBytes($this->uploadedBytes).')'),
+            $this->versioned === null ? null : "moved {$this->versioned} to versions",
+            sprintf('pruned %d old version folder(s)', count($this->prunedVersions)),
+            sprintf('%.1fs', $this->seconds),
+        ]);
+
+        return sprintf('[%s] ok: %d files (%s) → %s; %s.', $this->set, $this->files, self::humanBytes($this->bytes), $this->target, implode(', ', $parts));
     }
 
     public static function humanBytes(int $bytes): string
