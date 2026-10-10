@@ -1,0 +1,70 @@
+{
+    "name": "phattarachai/files-backup-laravel",
+    "description": "Incremental off-site backup of a Laravel app's content files (uploads, media library) through rclone or any Flysystem disk — versioned overwrites and deletes, staleness events and restore drills. The files sibling of phattarachai/db-snapshot-sync-laravel.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "backup",
+        "files",
+        "rclone",
+        "flysystem",
+        "google-drive",
+        "s3",
+        "retention",
+        "devops"
+    ],
+    "authors": [
+        {
+            "name": "Phattarachai Chaimongkol",
+            "email": "pc@phattarachai.dev"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "illuminate/console": "^12.0 || ^13.0",
+        "illuminate/contracts": "^12.0 || ^13.0",
+        "illuminate/filesystem": "^12.0 || ^13.0",
+        "illuminate/process": "^12.0 || ^13.0",
+        "illuminate/support": "^12.0 || ^13.0",
+        "league/flysystem": "^3.25",
+        "symfony/finder": "^7.2 || ^8.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.10",
+        "laravel/pint": "^1.29",
+        "orchestra/testbench": "^10.8|^11.0",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Phattarachai\\FilesBackupLaravel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Phattarachai\\FilesBackupLaravel\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "analyse": "vendor/bin/phpstan analyse",
+        "format": "vendor/bin/pint"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Phattarachai\\FilesBackupLaravel\\FilesBackupServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
