@@ -85,7 +85,7 @@ final readonly class RcloneDriver implements Driver
 
         $pruned = [];
 
-        foreach (preg_split('/\R/', trim($result->output())) ?: [] as $folder) {
+        foreach (preg_split('/\R/u', trim($result->output())) ?: [] as $folder) {
             $folder = trim($folder, '/');
             $stamp = VersionStamp::parse($folder);
 
@@ -218,7 +218,7 @@ final readonly class RcloneDriver implements Driver
     {
         $stats = [];
 
-        foreach (preg_split('/\R/', $log) ?: [] as $line) {
+        foreach (preg_split('/\R/u', $log) ?: [] as $line) {
             $entry = json_decode($line, true);
 
             if (is_array($entry) && is_array($entry['stats'] ?? null)) {
@@ -236,7 +236,7 @@ final readonly class RcloneDriver implements Driver
     {
         $lines = [];
 
-        foreach (preg_split('/\R/', trim($log)) ?: [] as $line) {
+        foreach (preg_split('/\R/u', trim($log)) ?: [] as $line) {
             $entry = json_decode($line, true);
 
             if (! is_array($entry)) {

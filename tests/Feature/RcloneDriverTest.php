@@ -154,6 +154,33 @@ it('purges version folders older than versions_days, and leaves foreign folders 
         ->toBe([['rclone', 'purge', 'filesbackup:myapp/media/versions/2026-09-01_033000', '--use-json-log']]);
 });
 
+it('reads rclone output with multibyte names whole', function (): void {
+    liveFile('a.jpg');
+    $stats = json_encode(['level' => 'notice', 'msg' => 'Transferred: รูปคนงาน ✅.jpg', 'stats' => ['transfers' => 3, 'bytes' => 2048, 'deletes' => 0]], JSON_UNESCAPED_UNICODE);
+    fakeRclone([
+        'sync' => Process::result(errorOutput: $stats."\n"),
+        'lsf' => Process::result("2026-09-01_033000/\nสำรองฅนงาน ✅/\n"),
+    ]);
+
+    $this->artisan('files:backup')
+        ->expectsOutputToContain('uploaded 3 (2 KB), pruned 1 old version folder(s)')
+        ->assertSuccessful();
+
+    expect(array_map(fn (PendingProcess $process): array => $process->command, rcloneCalls('purge')))
+        ->toBe([['rclone', 'purge', 'filesbackup:myapp/media/versions/2026-09-01_033000', '--use-json-log']]);
+});
+
+it('keeps multibyte characters whole in the rclone error it reports', function (): void {
+    liveFile('a.jpg');
+    fakeRclone(['check' => Process::result(
+        errorOutput: json_encode(['level' => 'error', 'msg' => 'ไม่พบไฟล์ ฅนงาน.jpg ✅'], JSON_UNESCAPED_UNICODE)."\n"."✅ เขียนไม่ได้\n",
+        exitCode: 1,
+    )]);
+
+    expect(fn () => $this->artisan('files:backup')->run())
+        ->toThrow(FilesBackupFailed::class, 'rclone check exited 1: ไม่พบไฟล์ ฅนงาน.jpg ✅ | ✅ เขียนไม่ได้');
+});
+
 it('treats a missing versions folder as nothing to prune', function (): void {
     liveFile('a.jpg');
     fakeRclone(['lsf' => Process::result(errorOutput: 'directory not found', exitCode: 3)]);
